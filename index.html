@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="오카야마 가는 길">
+<title>오카야마 가는 길</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--acc:#c8102e;--ok:#1a7f4b;--soft:#fbeaec}
+@media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1e1e21;--ink:#f2f2f4;--sub:#9c9ca3;--line:#2e2e33;--acc:#ff5a6e;--ok:#4fc98a;--soft:#3a1d22}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,"Apple SD Gothic Neo",sans-serif;padding:env(safe-area-inset-top) 16px 40px}
+h1{font-size:20px;margin:16px 0 4px}
+.sub{color:var(--sub);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.now{border:2px solid var(--acc)}
+.now h2{margin:4px 0 2px;font-size:22px}
+.tag{display:inline-block;font-size:13px;font-weight:600;color:var(--acc);background:var(--soft);border-radius:6px;padding:2px 8px}
+.gps{font-size:14px;color:var(--sub);margin-top:6px}
+ul{list-style:none;padding:0;margin:10px 0 0}
+li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+li input{width:24px;height:24px;flex:none;margin-top:2px;accent-color:var(--ok)}
+li.done span{color:var(--sub);text-decoration:line-through}
+.jp{font-weight:600}
+.row{display:flex;gap:8px;margin-top:12px}
+button,.btn{flex:1;font:inherit;font-size:16px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-align:center;text-decoration:none}
+.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.tl{margin:0;padding:0}
+.tl li{border:0;padding:6px 0;align-items:baseline}
+.tl .t{width:52px;flex:none;color:var(--sub);font-variant-numeric:tabular-nums;font-size:15px}
+.tl li.cur b{color:var(--acc)}
+.tl li.past{color:var(--sub)}
+details summary{font-weight:600;cursor:pointer}
+.warn{font-size:14px;color:var(--sub)}
+</style>
+</head>
+<body>
+<h1>간사이공항 → 오카야마역</h1>
+<div class="sub">11/29(일) · 시간은 모두 예상치. 실제 열차 시간은 역 전광판 기준</div>
+
+<div class="card now" id="now"></div>
+
+<div class="row">
+  <a class="btn" id="map" target="_blank" rel="noopener">구글지도 길찾기</a>
+  <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Claude에게 묻기</a>
+</div>
+
+<div class="card">
+  <b>전체 일정</b>
+  <ul class="tl" id="tl"></ul>
+</div>
+
+<div class="card">
+  <details>
+    <summary>출발 전 준비 (한국에서)</summary>
+    <ul id="prep"></ul>
+  </details>
+</div>
+
+<div class="card">
+  <details>
+    <summary>일본어 한 줄 (보여주기용)</summary>
+    <ul>
+      <li><span><span class="jp">岡山まで、はるかと新幹線の指定席をお願いします。</span><br>오카야마까지 하루카와 신칸센 지정석 부탁합니다.</span></li>
+      <li><span><span class="jp">新幹線の乗り換え口はどこですか？</span><br>신칸센 갈아타는 곳이 어디예요?</span></li>
+      <li><span><span class="jp">乗り遅れました。次の電車に変更できますか？</span><br>열차를 놓쳤어요. 다음 열차로 바꿀 수 있나요?</span></li>
+    </ul>
+  </details>
+</div>
+
+<p class="warn">위치는 이 폰 안에서만 쓰이고 어디에도 보내지 않습니다. 화면이 꺼지면 위치 갱신이 멈추니, 볼 때마다 화면을 켜 주세요. 역 안·지하에서는 GPS가 틀릴 수 있어 아래 버튼으로 직접 넘겨도 됩니다.</p>
+<div class="row"><button id="reset">처음부터 다시</button></div>
+
+<script>
+// 장소 좌표는 역/터미널 중심 근사값. r = 도착으로 볼 반경(m)
+const STEPS = [
+  {t:'11:40', title:'간사이공항 도착', where:'제1터미널', lat:34.4340, lng:135.2440, r:1500, todo:[
+    'Visit Japan Web QR 화면 미리 띄우기 (입국·세관 둘 다 사용)',
+    '입국심사 → 짐 찾기 → 세관 통과 (일요일 점심이라 40~60분 예상)',
+    '도착 로비에서 2층으로 올라가 연결통로를 건너면 JR역',
+    'JR 매표소 <span class="jp">みどりの窓口</span>에서 「오카야마까지 하루카+신칸센 지정석」 한 번에 구매 (아래 일본어 문장 보여주기)',
+    '표에 적힌 하루카 출발 시각·호차·좌석 사진 찍어 두기',
+    '전광판에서 <span class="jp">はるか</span> 승강장 확인 후 승차'
+  ]},
+  {t:'~13:00', title:'하루카 타고 이동 중', where:'약 50분', to:2, todo:[
+    '큰 짐은 객차 끝 짐칸에',
+    '내릴 역: <span class="jp">新大阪</span> 신오사카 (오사카역 바로 다음)',
+    '「오사카」 안내방송이 나오면 내릴 준비'
+  ]},
+  {t:'~13:50', title:'신오사카 환승', where:'신칸센으로 갈아타기', lat:34.7334, lng:135.5001, r:600, todo:[
+    '내려서 <span class="jp">新幹線 のりかえ</span> (신칸센 환승) 표지판 따라가기',
+    '환승 개찰구에 가진 표를 전부 겹쳐 넣기 → 나오는 표 꼭 다시 챙기기',
+    '전광판에서 내 열차(<span class="jp">のぞみ・さくら・みずほ・ひかり</span> 중 표에 적힌 것)와 승강장 번호 확인',
+    '바닥에 표시된 호차 번호 위치에서 기다리기',
+    '시간 여유 있으면 화장실·도시락(<span class="jp">駅弁</span>)'
+  ]},
+  {t:'~14:10', title:'신칸센 타고 이동 중', where:'약 35~45분', to:4, todo:[
+    '신고베 → (일부 열차는 히메지) → 다음이 오카야마',
+    '「<span class="jp">岡山</span> 오카야마」 안내방송이 나오면 짐 챙기기'
+  ]},
+  {t:'~14:50', title:'오카야마역 도착', where:'도착!', lat:34.6664, lng:133.9180, r:600, todo:[
+    '신칸센 개찰구에 표 넣고 나가기 (표가 회수되면 정상)',
+    '목적지 출구 확인: 동쪽 <span class="jp">東口</span>(시내·버스) / 서쪽 <span class="jp">西口</span>'
+  ]}
+];
+const PREP = [
+  'Visit Japan Web 등록 완료하고 QR 스크린샷 저장',
+  '비행기 도착시간 다시 확인 (TW327, 11/29 도착시간)',
+  '일본 데이터 준비 (로밍 또는 eSIM)',
+  '엔화 현금 조금 + 해외결제 되는 카드 (JR 매표소는 카드 가능)',
+  '이 페이지를 Safari에서 열고 공유 → 「홈 화면에 추가」',
+  '처음 열 때 위치 권한 「허용」'
+];
+
+// 두 좌표 사이 거리(m)
+function dist(a, b, c, d){
+  const R = 6371000, rad = x => x * Math.PI / 180;
+  const h = Math.sin(rad(c-a)/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+// 위치로 단계 결정: 앞으로만 진행(GPS 흔들림으로 되돌아가지 않게)
+function stepFor(cur, lat, lng){
+  for (let i = STEPS.length - 1; i > cur; i--) {
+    const s = STEPS[i];
+    if (s.lat && dist(lat, lng, s.lat, s.lng) <= s.r) return i;
+  }
+  const s = STEPS[cur];
+  if (s.lat && STEPS[cur+1] && !STEPS[cur+1].lat && dist(lat, lng, s.lat, s.lng) > s.r * 1.5) return cur + 1;
+  return cur;
+}
+
+const store = {
+  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let cur = store.get('cur', 0), checks = store.get('checks', {}), pos = null, gpsMsg = '위치 확인 중…';
+
+function list(id, items, prefix){
+  return items.map((txt, j) => {
+    const k = prefix + j, on = !!checks[k];
+    return `<li class="${on?'done':''}"><input type="checkbox" data-k="${k}" ${on?'checked':''} aria-label="완료"><span>${txt}</span></li>`;
+  }).join('');
+}
+function render(){
+  const s = STEPS[cur];
+  let near = '';
+  if (pos) {
+    const nx = s.lat ? null : STEPS[s.to];
+    if (nx) near = ` · ${nx.title.replace(' 환승','').replace(' 도착','')}까지 약 ${(dist(pos.lat,pos.lng,nx.lat,nx.lng)/1000).toFixed(1)}km`;
+  }
+  document.getElementById('now').innerHTML =
+    `<span class="tag">지금 할 일 · ${cur+1}/${STEPS.length}</span><h2>${s.title}</h2><div class="sub">${s.t} · ${s.where}</div>
+     <div class="gps">${gpsMsg}${near}</div><ul>${list('now', s.todo, 's'+cur+'_')}</ul>
+     <div class="row"><button id="prev" ${cur?'':'disabled'}>◀ 이전</button><button class="pri" id="next" ${cur<STEPS.length-1?'':'disabled'}>다음 단계 ▶</button></div>`;
+  document.getElementById('tl').innerHTML = STEPS.map((x,i) =>
+    `<li class="${i===cur?'cur':i<cur?'past':''}"><span class="t">${x.t}</span><span>${i===cur?'<b>'+x.title+'</b>':x.title}</span></li>`).join('');
+  document.getElementById('prep').innerHTML = list('prep', PREP, 'p');
+  const dest = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('岡山駅') + '&travelmode=transit';
+  document.getElementById('map').href = dest;
+  document.getElementById('prev').onclick = () => go(cur - 1);
+  document.getElementById('next').onclick = () => go(cur + 1);
+}
+function go(i){ cur = Math.max(0, Math.min(STEPS.length - 1, i)); store.set('cur', cur); render(); }
+
+document.addEventListener('change', e => {
+  const k = e.target.dataset && e.target.dataset.k;
+  if (!k) return;
+  checks[k] = e.target.checked; store.set('checks', checks); render();
+});
+document.getElementById('reset').onclick = () => {
+  if (confirm('체크와 진행 단계를 모두 지울까요?')) { checks = {}; store.set('checks', checks); go(0); }
+};
+
+function onPos(p){
+  pos = {lat: p.coords.latitude, lng: p.coords.longitude};
+  gpsMsg = `위치 갱신 ${new Date().toTimeString().slice(0,5)} (오차 약 ${Math.round(p.coords.accuracy)}m)`;
+  const n = stepFor(cur, pos.lat, pos.lng);
+  if (n !== cur) { cur = n; store.set('cur', cur); if (navigator.vibrate) navigator.vibrate(200); }
+  render();
+}
+function onErr(e){
+  gpsMsg = e.code === 1 ? '위치 권한이 꺼져 있음 → 설정 > Safari > 위치에서 허용. 지금은 버튼으로 넘기세요.' : '위치를 못 잡는 중 (실내·지하일 수 있음). 버튼으로 넘겨도 됩니다.';
+  render();
+}
+if ('geolocation' in navigator) navigator.geolocation.watchPosition(onPos, onErr, {enableHighAccuracy:true, maximumAge:30000, timeout:30000});
+else gpsMsg = '이 브라우저는 위치를 지원하지 않음';
+render();
+</script>
+</body>
+</html>
