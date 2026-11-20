@@ -7,112 +7,180 @@
 <meta name="apple-mobile-web-app-title" content="오카야마 가는 길">
 <title>오카야마 가는 길</title>
 <style>
-:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--acc:#c8102e;--ok:#1a7f4b;--soft:#fbeaec}
-@media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1e1e21;--ink:#f2f2f4;--sub:#9c9ca3;--line:#2e2e33;--acc:#ff5a6e;--ok:#4fc98a;--soft:#3a1d22}}
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--acc:#c8102e;--ok:#1a7f4b;--soft:#fbeaec;--sign:#1f2a44;--signink:#fff;--note:#fff6dc;--noteink:#5c4a00}
+@media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1e1e21;--ink:#f2f2f4;--sub:#9c9ca3;--line:#2e2e33;--acc:#ff5a6e;--ok:#4fc98a;--soft:#3a1d22;--sign:#0b1020;--note:#3a3214;--noteink:#f3e3a6}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,"Apple SD Gothic Neo",sans-serif;padding:env(safe-area-inset-top) 16px 40px}
-h1{font-size:20px;margin:16px 0 4px}
-.sub{color:var(--sub);font-size:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
-.now{border:2px solid var(--acc)}
-.now h2{margin:4px 0 2px;font-size:22px}
-.tag{display:inline-block;font-size:13px;font-weight:600;color:var(--acc);background:var(--soft);border-radius:6px;padding:2px 8px}
-.gps{font-size:14px;color:var(--sub);margin-top:6px}
-ul{list-style:none;padding:0;margin:10px 0 0}
-li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
-li:first-child{border-top:0}
-li input{width:24px;height:24px;flex:none;margin-top:2px;accent-color:var(--ok)}
-li.done span{color:var(--sub);text-decoration:line-through}
-.jp{font-weight:600}
-.row{display:flex;gap:8px;margin-top:12px}
-button,.btn{flex:1;font:inherit;font-size:16px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-align:center;text-decoration:none}
-.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
-.tl{margin:0;padding:0}
-.tl li{border:0;padding:6px 0;align-items:baseline}
-.tl .t{width:52px;flex:none;color:var(--sub);font-variant-numeric:tabular-nums;font-size:15px}
-.tl li.cur b{color:var(--acc)}
-.tl li.past{color:var(--sub)}
-details summary{font-weight:600;cursor:pointer}
-.warn{font-size:14px;color:var(--sub)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.55 -apple-system,"Apple SD Gothic Neo",sans-serif;padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 96px)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.phase{font-size:14px;font-weight:700;color:var(--acc)}
+.count{font-size:14px;color:var(--sub)}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:8px 0 14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.gps{font-size:13px;color:var(--sub);margin:-6px 0 10px}
+.jump{display:block;width:100%;margin:0 0 12px;padding:12px;border-radius:12px;border:2px dashed var(--acc);background:var(--soft);color:var(--ink);font:inherit;font-size:16px}
+h1{font-size:26px;line-height:1.3;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:0 0 12px}
+.lbl{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.sign{display:inline-block;background:var(--sign);color:var(--signink);border-radius:8px;padding:6px 12px;margin:2px 6px 2px 0;font-weight:700;font-size:20px}
+.sign small{font-weight:500;font-size:14px;opacity:.85;margin-left:6px}
+.note{background:var(--note);color:var(--noteink);border-radius:12px;padding:12px 14px;font-size:16px;margin:0 0 12px}
+ol{margin:0;padding-left:22px}
+ol li{margin:4px 0}
+.jp{font-weight:700}
+.show{width:100%;font:inherit;font-weight:700;padding:14px;border-radius:12px;border:2px solid var(--ink);background:var(--card);color:var(--ink);margin-bottom:12px}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px 16px calc(env(safe-area-inset-bottom) + 10px);background:var(--bg);border-top:1px solid var(--line)}
+.nav button{font:inherit;border-radius:12px;padding:14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.nav .back{flex:0 0 72px}
+.nav .help{flex:0 0 88px;color:var(--acc);font-weight:700}
+.nav .next{flex:1;background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700;font-size:19px}
+.nav button:disabled{opacity:.4}
+.sheet{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 40px;display:none;z-index:5}
+.sheet.on{display:block}
+.close{float:right;font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.big{position:fixed;inset:0;background:#fff;color:#000;z-index:9;display:none;flex-direction:column;justify-content:center;padding:24px;text-align:center}
+.big.on{display:flex}
+.big .ja{font-size:30px;font-weight:800;line-height:1.5}
+.big .ko{font-size:16px;color:#555;margin-top:18px}
+.big .hint{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 16px);left:0;right:0;font-size:14px;color:#888}
+.list button{display:block;width:100%;text-align:left;font:inherit;padding:14px;margin:0 0 8px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.list button span{display:block;font-size:14px;color:var(--sub)}
+a.lnk{display:block;text-align:center;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;margin:0 0 8px}
+.tiny{font-size:13px;color:var(--sub)}
 </style>
 </head>
 <body>
-<h1>간사이공항 → 오카야마역</h1>
-<div class="sub">11/29(일) · 시간은 모두 예상치. 실제 열차 시간은 역 전광판 기준</div>
 
-<div class="card now" id="now"></div>
+<div class="top"><span class="phase" id="phase"></span><span class="count" id="count"></span></div>
+<div class="bar"><i id="bar"></i></div>
+<div class="gps" id="gps">위치 확인 중…</div>
+<div id="jumpbox"></div>
+<main id="step"></main>
 
-<div class="row">
-  <a class="btn" id="map" target="_blank" rel="noopener">구글지도 길찾기</a>
-  <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Claude에게 묻기</a>
-</div>
+<nav class="nav">
+  <button class="back" id="back" aria-label="이전 단계">◀</button>
+  <button class="help" id="helpBtn">도움</button>
+  <button class="next" id="next">했어요 · 다음 ▶</button>
+</nav>
 
-<div class="card">
-  <b>전체 일정</b>
-  <ul class="tl" id="tl"></ul>
-</div>
+<!-- 도움 화면 -->
+<section class="sheet" id="help" aria-label="도움">
+  <button class="close" data-close>닫기</button>
+  <h1>도움이 필요할 때</h1>
+  <div class="lbl">직원에게 화면 보여주기 (누르면 크게 나와요)</div>
+  <div class="list" id="cards"></div>
+  <div class="note"><b>열차를 놓쳤어도 괜찮아요.</b> 지정석 표는 <b>같은 날 다음 열차의 자유석(自由席) 칸</b>에 탈 수 있는 게 기본 규칙이에요. 그래도 먼저 역 직원에게 「열차 놓침」 화면을 보여주세요.</div>
+  <div class="lbl">길찾기 · 질문</div>
+  <a class="lnk" id="mapLink" target="_blank" rel="noopener">구글지도로 오카야마역 가는 길</a>
+  <a class="lnk" href="https://claude.ai/new" target="_blank" rel="noopener">Claude에게 물어보기</a>
+  <div class="lbl">긴급 연락</div>
+  <a class="lnk" href="tel:110">경찰 110</a>
+  <a class="lnk" href="tel:119">구급·화재 119</a>
+  <a class="lnk" href="tel:+82232100404">외교부 영사콜센터 (24시간, 한국어) +82-2-3210-0404</a>
+  <div class="lbl" style="margin-top:16px">전체 순서로 이동</div>
+  <div class="list" id="toc"></div>
+  <button class="close" id="reset" style="float:none;margin-top:12px">처음부터 다시</button>
+  <p class="tiny">위치는 이 폰 안에서만 쓰이고 어디에도 보내지 않아요. 화면이 꺼지면 위치가 멈추니, 이동 중에는 가끔 화면을 켜 주세요.</p>
+</section>
 
-<div class="card">
-  <details>
-    <summary>출발 전 준비 (한국에서)</summary>
-    <ul id="prep"></ul>
-  </details>
-</div>
-
-<div class="card">
-  <details>
-    <summary>일본어 한 줄 (보여주기용)</summary>
-    <ul>
-      <li><span><span class="jp">岡山まで、はるかと新幹線の指定席をお願いします。</span><br>오카야마까지 하루카와 신칸센 지정석 부탁합니다.</span></li>
-      <li><span><span class="jp">新幹線の乗り換え口はどこですか？</span><br>신칸센 갈아타는 곳이 어디예요?</span></li>
-      <li><span><span class="jp">乗り遅れました。次の電車に変更できますか？</span><br>열차를 놓쳤어요. 다음 열차로 바꿀 수 있나요?</span></li>
-    </ul>
-  </details>
-</div>
-
-<p class="warn">위치는 이 폰 안에서만 쓰이고 어디에도 보내지 않습니다. 화면이 꺼지면 위치 갱신이 멈추니, 볼 때마다 화면을 켜 주세요. 역 안·지하에서는 GPS가 틀릴 수 있어 아래 버튼으로 직접 넘겨도 됩니다.</p>
-<div class="row"><button id="reset">처음부터 다시</button></div>
+<!-- 크게 보여주기 -->
+<div class="big" id="big" role="dialog"><div class="ja" id="bigJa"></div><div class="ko" id="bigKo"></div><div class="hint">화면을 누르면 닫혀요</div></div>
 
 <script>
-// 장소 좌표는 역/터미널 중심 근사값. r = 도착으로 볼 반경(m)
+// 직원에게 보여줄 일본어 카드
+const CARDS = {
+  ticket:{t:'표 사기 (매표소)', ja:'岡山駅まで行きます。<br>関西空港から「はるか」で新大阪、<br>新幹線で岡山まで、<br>指定席の切符をお願いします。', ko:'오카야마역까지 갑니다. 간사이공항에서 하루카로 신오사카, 신칸센으로 오카야마까지 지정석 표 부탁합니다.'},
+  shinkansen:{t:'신칸센 갈아타는 곳', ja:'新幹線の乗り換え口は<br>どこですか？', ko:'신칸센 갈아타는 곳이 어디예요?'},
+  thistrain:{t:'이 열차 맞아요?', ja:'この電車は<br>新大阪に行きますか？', ko:'이 열차 신오사카에 가나요?'},
+  thisshin:{t:'이 신칸센 맞아요?', ja:'この新幹線は<br>岡山に止まりますか？', ko:'이 신칸센 오카야마에 서나요?'},
+  missed:{t:'열차를 놓쳤어요', ja:'電車に乗り遅れました。<br>次の電車に乗れますか？', ko:'열차를 놓쳤어요. 다음 열차를 탈 수 있나요?'},
+  lost:{t:'표를 잃어버렸어요', ja:'切符をなくしました。<br>どうすればいいですか？', ko:'표를 잃어버렸어요. 어떻게 하면 되나요?'},
+  help:{t:'일본어 못해요 · 도와주세요', ja:'日本語が話せません。<br>岡山駅へ行きたいです。<br>助けてください。', ko:'일본어를 못 해요. 오카야마역에 가고 싶어요. 도와주세요.'},
+  toilet:{t:'화장실', ja:'トイレはどこですか？', ko:'화장실이 어디예요?'}
+};
+
+// 구간: 좌표가 있으면 그 근처에 왔을 때 자동으로 넘어감 (r = 반경 m)
+const PHASES = [
+  {name:'① 간사이공항', lat:34.4340, lng:135.2440, r:1500},
+  {name:'② 하루카 안'},
+  {name:'③ 신오사카 환승', lat:34.7334, lng:135.5001, r:600},
+  {name:'④ 신칸센 안'},
+  {name:'⑤ 오카야마 도착', lat:34.6664, lng:133.9180, r:600}
+];
+
+// 한 화면 = 한 동작
 const STEPS = [
-  {t:'11:40', title:'간사이공항 도착', where:'제1터미널', lat:34.4340, lng:135.2440, r:1500, todo:[
-    'Visit Japan Web QR 화면 미리 띄우기 (입국·세관 둘 다 사용)',
-    '입국심사 → 짐 찾기 → 세관 통과 (일요일 점심이라 40~60분 예상)',
-    '도착 로비에서 2층으로 올라가 연결통로를 건너면 JR역',
-    'JR 매표소 <span class="jp">みどりの窓口</span>에서 「오카야마까지 하루카+신칸센 지정석」 한 번에 구매 (아래 일본어 문장 보여주기)',
-    '표에 적힌 하루카 출발 시각·호차·좌석 사진 찍어 두기',
-    '전광판에서 <span class="jp">はるか</span> 승강장 확인 후 승차'
-  ]},
-  {t:'~13:00', title:'하루카 타고 이동 중', where:'약 50분', to:2, todo:[
-    '큰 짐은 객차 끝 짐칸에',
-    '내릴 역: <span class="jp">新大阪</span> 신오사카 (오사카역 바로 다음)',
-    '「오사카」 안내방송이 나오면 내릴 준비'
-  ]},
-  {t:'~13:50', title:'신오사카 환승', where:'신칸센으로 갈아타기', lat:34.7334, lng:135.5001, r:600, todo:[
-    '내려서 <span class="jp">新幹線 のりかえ</span> (신칸센 환승) 표지판 따라가기',
-    '환승 개찰구에 가진 표를 전부 겹쳐 넣기 → 나오는 표 꼭 다시 챙기기',
-    '전광판에서 내 열차(<span class="jp">のぞみ・さくら・みずほ・ひかり</span> 중 표에 적힌 것)와 승강장 번호 확인',
-    '바닥에 표시된 호차 번호 위치에서 기다리기',
-    '시간 여유 있으면 화장실·도시락(<span class="jp">駅弁</span>)'
-  ]},
-  {t:'~14:10', title:'신칸센 타고 이동 중', where:'약 35~45분', to:4, todo:[
-    '신고베 → (일부 열차는 히메지) → 다음이 오카야마',
-    '「<span class="jp">岡山</span> 오카야마」 안내방송이 나오면 짐 챙기기'
-  ]},
-  {t:'~14:50', title:'오카야마역 도착', where:'도착!', lat:34.6664, lng:133.9180, r:600, todo:[
-    '신칸센 개찰구에 표 넣고 나가기 (표가 회수되면 정상)',
-    '목적지 출구 확인: 동쪽 <span class="jp">東口</span>(시내·버스) / 서쪽 <span class="jp">西口</span>'
-  ]}
+  {p:0, h:'비행기에서 내리면, 이 표지판을 따라 걸어요', signs:['入国 <small>Arrivals</small>'],
+   todo:['여권을 손에 들기','Visit Japan Web QR 화면(입국용)을 미리 켜 두기'],
+   note:'11:40 도착 예정. 사람 많은 쪽을 따라가면 거의 맞아요.'},
+  {p:0, h:'입국심사: 외국인 줄에 서요', signs:['外国人 <small>Foreign Passports</small>'],
+   todo:['차례가 오면 여권 + 입국 QR 보여주기','기계에 양손 검지 지문 → 얼굴 사진','끝나면 앞으로 직진']},
+  {p:0, h:'짐 찾기: 전광판에서 내 비행기 번호를 찾아요', signs:['TW327','CHEONGJU <small>청주</small>'],
+   todo:['옆에 적힌 숫자 = 짐 나오는 벨트 번호','그 벨트에서 내 가방 찾기'],
+   note:'짐이 안 나오면 근처 「手荷物 Baggage」 카운터에 탑승권(짐표 스티커)을 보여주세요.'},
+  {p:0, h:'세관: QR 찍고 나가요',
+   todo:['Visit Japan Web의 세관 QR 화면 켜기','전자 게이트 기계에 여권 올리고 QR 찍기','문이 열리면 그대로 나가기'],
+   note:'기계가 어려우면 직원 있는 줄로 가도 돼요.'},
+  {p:0, h:'도착 로비로 나왔어요. 에스컬레이터로 2층에 올라가요', signs:['2F'],
+   todo:['기차 그림 표지판과 「鉄道 Railways」 글자를 찾기','그쪽 에스컬레이터로 2층'],
+   note:'잠깐 쉬어도 돼요. 화장실·환전·편의점이 이 근처에 있어요.'},
+  {p:0, h:'2층에서 다리를 건너 역으로 가요', signs:['鉄道 <small>Railways</small>','JR'],
+   todo:['공항 건물과 역을 잇는 연결 다리를 건너기','몇 분이면 역이에요']},
+  {p:0, h:'역 앞: 파란색 JR 쪽으로 가요', signs:['JR <small>파란색</small>'],
+   todo:['파란색 = JR (우리가 탈 것)','빨간색 = 난카이(南海) → 아니에요'],
+   note:'헷갈리면 「도움」 → 「일본어 못해요」 화면을 보여주세요.'},
+  {p:0, h:'초록색 매표소에서 표를 사요', signs:['みどりの窓口 <small>JR 매표소</small>'],
+   todo:['여권 준비 (외국인은 보여달라고 할 수 있어요)','아래 버튼을 눌러 직원에게 화면 보여주기','카드 또는 현금으로 결제'],
+   card:'ticket',
+   note:'영업 5:30~23:00. 외국인 응대 직원이 있어요. 표는 2~3장 나올 수 있어요 — 전부 챙기세요.'},
+  {p:0, h:'받은 표를 사진 찍어 두세요',
+   todo:['하루카: 출발 시각 · 호차(○号車) · 좌석','신칸센: 열차 이름 · 출발 시각 · 호차 · 좌석','시간 여유를 확인 (하루카 출발까지 몇 분?)'],
+   note:'표를 잃어버려도 사진이 있으면 설명하기 쉬워요.'},
+  {p:0, h:'개찰구: 표를 전부 겹쳐서 넣어요', signs:['改札 <small>개찰구</small>'],
+   todo:['표 넣는 구멍이 있는 개찰구로 (IC 카드 전용 말고)','가진 표를 전부 겹쳐서 한 번에 넣기','반대편으로 나온 표를 <b>전부 다시 뽑기</b>'],
+   note:'표가 안 나오면 멈춰서 직원에게. 표를 개찰구에 두고 가면 안 돼요.'},
+  {p:0, h:'전광판에서 「はるか」를 찾아 승강장으로', signs:['はるか <small>HARUKA</small>','京都 <small>교토행</small>'],
+   todo:['내 표의 출발 시각과 같은 はるか 찾기','옆에 적힌 승강장(番線) 번호로 가기','바닥에 적힌 내 호차 번호 앞에서 기다리기'],
+   card:'thistrain',
+   note:'행선지가 「京都 교토」여도 맞아요. 신오사카를 지나 교토까지 가는 열차예요.'},
+  {p:1, h:'하루카에 탔어요. 짐 놓고 앉아요',
+   todo:['큰 가방은 객차 끝 짐칸에','표에 적힌 좌석에 앉기','내릴 역: 新大阪 신오사카 (약 50분)'],
+   note:'중간에 天王寺 덴노지, 大阪 오사카 등을 지나요. 거기서 내리면 안 돼요.'},
+  {p:1, h:'「まもなく新大阪」 방송이 나오면 내릴 준비', signs:['新大阪 <small>Shin-Osaka</small>'],
+   todo:['짐 챙기기','표 전부 챙겼는지 확인','문 앞으로'],
+   note:'위쪽의 남은 거리 숫자가 1~2km면 거의 다 왔어요.'},
+  {p:2, h:'내리면, 신칸센 표지판을 따라가요', signs:['新幹線 <small>Shinkansen</small>','のりかえ <small>갈아타기</small>'],
+   todo:['계단·에스컬레이터로 위층으로','新幹線 표지판만 따라 걷기'],
+   card:'shinkansen'},
+  {p:2, h:'신칸센 갈아타는 개찰구: 표를 전부 넣어요', signs:['新幹線のりかえ口 <small>신칸센 환승 개찰구</small>'],
+   todo:['가진 표를 전부 겹쳐서 한 번에 넣기','나온 표를 전부 다시 뽑기'],
+   note:'1장이 안 나올 수 있어요(다 쓴 하루카 표). 정상이에요.'},
+  {p:2, h:'전광판에서 내 신칸센을 찾아요', signs:['のぞみ','さくら','みずほ','ひかり'],
+   todo:['표에 적힌 열차 이름 + 출발 시각과 같은 줄 찾기','그 줄의 승강장 번호 확인 (보통 20~22번)','그 번호 쪽 에스컬레이터로 올라가기'],
+   note:'시간 여유가 있으면 화장실·도시락(駅弁)은 지금. 신칸센 안에서도 먹어도 돼요.'},
+  {p:2, h:'승강장: 내 호차 번호 앞에서 기다려요',
+   todo:['바닥이나 기둥에 적힌 호차(号車) 번호 찾기','같은 번호 앞에 줄 서기','열차 앞쪽 전광판에 열차 이름 확인 후 타기'],
+   card:'thisshin',
+   note:'신칸센은 1~2분만 서요. 문 열리면 바로 타세요.'},
+  {p:3, h:'신칸센에 탔어요. 좌석에 앉아요',
+   todo:['표에 적힌 좌석 찾기','큰 짐은 객차 끝 짐칸 또는 다리 앞','내릴 역: 岡山 오카야마 (약 35~45분)'],
+   note:'新神戸 신고베 → (열차에 따라 姫路 히메지) → 다음이 오카야마예요.'},
+  {p:3, h:'「まもなく岡山」 방송이 나오면 내릴 준비', signs:['岡山 <small>Okayama</small>'],
+   todo:['짐 챙기기','표 챙기기 (나갈 때 필요)','문 앞으로']},
+  {p:4, h:'내리면 「出口」를 따라 개찰구로', signs:['出口 <small>Exit</small>','新幹線改札'],
+   todo:['표를 전부 넣고 나가기','표가 안 나오면 정상 (회수됨)']},
+  {p:4, h:'도착했어요! 목적지 출구로 나가요', signs:['東口 <small>동쪽: 시내·버스</small>','西口 <small>서쪽</small>'],
+   todo:['가는 곳에 맞는 출구로','모르면 「도움」 → 구글지도'],
+   note:'수고하셨어요. 도착했다고 연락 주세요!'}
 ];
-const PREP = [
-  'Visit Japan Web 등록 완료하고 QR 스크린샷 저장',
-  '비행기 도착시간 다시 확인 (TW327, 11/29 도착시간)',
-  '일본 데이터 준비 (로밍 또는 eSIM)',
-  '엔화 현금 조금 + 해외결제 되는 카드 (JR 매표소는 카드 가능)',
-  '이 페이지를 Safari에서 열고 공유 → 「홈 화면에 추가」',
-  '처음 열 때 위치 권한 「허용」'
-];
+
+const store = {
+  get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let cur = Math.min(store.get('step', 0), STEPS.length - 1), pos = null, offer = null;
+const $ = id => document.getElementById(id);
+const firstOf = p => STEPS.findIndex(s => s.p === p);
 
 // 두 좌표 사이 거리(m)
 function dist(a, b, c, d){
@@ -120,72 +188,76 @@ function dist(a, b, c, d){
   const h = Math.sin(rad(c-a)/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
-// 위치로 단계 결정: 앞으로만 진행(GPS 흔들림으로 되돌아가지 않게)
-function stepFor(cur, lat, lng){
-  for (let i = STEPS.length - 1; i > cur; i--) {
-    const s = STEPS[i];
-    if (s.lat && dist(lat, lng, s.lat, s.lng) <= s.r) return i;
+// 위치로 "지금 있어야 할 구간" 판단. 앞으로만 (GPS가 튀어도 뒤로 안 감)
+function phaseFor(p, lat, lng){
+  for (let i = PHASES.length - 1; i > p; i--) {
+    const z = PHASES[i];
+    if (z.lat && dist(lat, lng, z.lat, z.lng) <= z.r) return i;
   }
-  const s = STEPS[cur];
-  if (s.lat && STEPS[cur+1] && !STEPS[cur+1].lat && dist(lat, lng, s.lat, s.lng) > s.r * 1.5) return cur + 1;
-  return cur;
+  const z = PHASES[p];
+  if (z.lat && PHASES[p+1] && !PHASES[p+1].lat && dist(lat, lng, z.lat, z.lng) > z.r * 1.5) return p + 1;
+  return p;
 }
 
-const store = {
-  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e){ return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-};
-let cur = store.get('cur', 0), checks = store.get('checks', {}), pos = null, gpsMsg = '위치 확인 중…';
-
-function list(id, items, prefix){
-  return items.map((txt, j) => {
-    const k = prefix + j, on = !!checks[k];
-    return `<li class="${on?'done':''}"><input type="checkbox" data-k="${k}" ${on?'checked':''} aria-label="완료"><span>${txt}</span></li>`;
-  }).join('');
-}
 function render(){
   const s = STEPS[cur];
-  let near = '';
-  if (pos) {
-    const nx = s.lat ? null : STEPS[s.to];
-    if (nx) near = ` · ${nx.title.replace(' 환승','').replace(' 도착','')}까지 약 ${(dist(pos.lat,pos.lng,nx.lat,nx.lng)/1000).toFixed(1)}km`;
-  }
-  document.getElementById('now').innerHTML =
-    `<span class="tag">지금 할 일 · ${cur+1}/${STEPS.length}</span><h2>${s.title}</h2><div class="sub">${s.t} · ${s.where}</div>
-     <div class="gps">${gpsMsg}${near}</div><ul>${list('now', s.todo, 's'+cur+'_')}</ul>
-     <div class="row"><button id="prev" ${cur?'':'disabled'}>◀ 이전</button><button class="pri" id="next" ${cur<STEPS.length-1?'':'disabled'}>다음 단계 ▶</button></div>`;
-  document.getElementById('tl').innerHTML = STEPS.map((x,i) =>
-    `<li class="${i===cur?'cur':i<cur?'past':''}"><span class="t">${x.t}</span><span>${i===cur?'<b>'+x.title+'</b>':x.title}</span></li>`).join('');
-  document.getElementById('prep').innerHTML = list('prep', PREP, 'p');
-  const dest = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('岡山駅') + '&travelmode=transit';
-  document.getElementById('map').href = dest;
-  document.getElementById('prev').onclick = () => go(cur - 1);
-  document.getElementById('next').onclick = () => go(cur + 1);
+  $('phase').textContent = PHASES[s.p].name;
+  $('count').textContent = `${cur+1} / ${STEPS.length}`;
+  const g = gpsText(); if (g) $('gps').textContent = g;
+  $('bar').style.width = ((cur+1) / STEPS.length * 100) + '%';
+  $('step').innerHTML =
+    `<h1>${s.h}</h1>` +
+    (s.signs ? `<div class="card"><div class="lbl">이 글자를 찾으세요</div>${s.signs.map(x=>`<span class="sign">${x}</span>`).join('')}</div>` : '') +
+    `<div class="card"><div class="lbl">할 일</div><ol>${s.todo.map(x=>`<li>${x}</li>`).join('')}</ol></div>` +
+    (s.card ? `<button class="show" data-card="${s.card}">📱 직원에게 보여주기: ${CARDS[s.card].t}</button>` : '') +
+    (s.note ? `<div class="note">${s.note}</div>` : '');
+  $('back').disabled = cur === 0;
+  $('next').disabled = cur === STEPS.length - 1;
+  $('next').textContent = cur === STEPS.length - 1 ? '도착 완료 🎉' : '했어요 · 다음 ▶';
+  $('jumpbox').innerHTML = offer != null
+    ? `<button class="jump" id="jump">📍 지금 「${PHASES[offer].name}」 근처예요. 그 단계로 갈까요?</button>` : '';
+  if (offer != null) $('jump').onclick = () => { go(firstOf(offer)); };
 }
-function go(i){ cur = Math.max(0, Math.min(STEPS.length - 1, i)); store.set('cur', cur); render(); }
+function go(i){ cur = Math.max(0, Math.min(STEPS.length - 1, i)); offer = null; store.set('step', cur); render(); window.scrollTo(0, 0); }
 
-document.addEventListener('change', e => {
-  const k = e.target.dataset && e.target.dataset.k;
-  if (!k) return;
-  checks[k] = e.target.checked; store.set('checks', checks); render();
+$('next').onclick = () => go(cur + 1);
+$('back').onclick = () => go(cur - 1);
+$('helpBtn').onclick = () => $('help').classList.add('on');
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => $('help').classList.remove('on'));
+$('reset').onclick = () => { if (confirm('처음 단계로 돌아갈까요?')) { go(0); $('help').classList.remove('on'); } };
+$('mapLink').href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('岡山駅') + '&travelmode=transit';
+$('cards').innerHTML = Object.entries(CARDS).map(([k,c]) => `<button data-card="${k}">${c.t}<span>${c.ko}</span></button>`).join('');
+$('toc').innerHTML = STEPS.map((s,i) => `<button data-goto="${i}">${i+1}. ${s.h}<span>${PHASES[s.p].name}</span></button>`).join('');
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-card]'), g = e.target.closest('[data-goto]');
+  if (c) { $('bigJa').innerHTML = CARDS[c.dataset.card].ja; $('bigKo').textContent = CARDS[c.dataset.card].ko; $('big').classList.add('on'); }
+  if (g) { go(+g.dataset.goto); $('help').classList.remove('on'); }
 });
-document.getElementById('reset').onclick = () => {
-  if (confirm('체크와 진행 단계를 모두 지울까요?')) { checks = {}; store.set('checks', checks); go(0); }
-};
+$('big').onclick = () => $('big').classList.remove('on');
+
+// 화면 꺼짐 방지 (지원하는 iOS에서만; 안 되면 그냥 넘어감)
+async function keepAwake(){ try { if ('wakeLock' in navigator && document.visibilityState === 'visible') await navigator.wakeLock.request('screen'); } catch(e){} }
+document.addEventListener('visibilitychange', keepAwake);
+document.addEventListener('click', keepAwake, {once:true});
 
 function onPos(p){
-  pos = {lat: p.coords.latitude, lng: p.coords.longitude};
-  gpsMsg = `위치 갱신 ${new Date().toTimeString().slice(0,5)} (오차 약 ${Math.round(p.coords.accuracy)}m)`;
-  const n = stepFor(cur, pos.lat, pos.lng);
-  if (n !== cur) { cur = n; store.set('cur', cur); if (navigator.vibrate) navigator.vibrate(200); }
+  pos = {lat: p.coords.latitude, lng: p.coords.longitude, at: new Date().toTimeString().slice(0,5)};
+  const ph = STEPS[cur].p, want = phaseFor(ph, pos.lat, pos.lng);
+  // 알아서 넘기지 않고 물어봄: 실내 GPS 오차로 잘못 넘어가는 것 방지
+  offer = want > ph ? want : null;
   render();
+}
+function gpsText(){
+  if (!pos) return null;
+  const ph = STEPS[cur].p, nx = PHASES.slice(ph + 1).find(z => z.lat);
+  let msg = `📍 위치 ${pos.at} 갱신`;
+  if (!PHASES[ph].lat && nx) msg += ` · ${nx.name.slice(2)}까지 약 ${(dist(pos.lat,pos.lng,nx.lat,nx.lng)/1000).toFixed(1)}km`;
+  return msg;
 }
 function onErr(e){
-  gpsMsg = e.code === 1 ? '위치 권한이 꺼져 있음 → 설정 > Safari > 위치에서 허용. 지금은 버튼으로 넘기세요.' : '위치를 못 잡는 중 (실내·지하일 수 있음). 버튼으로 넘겨도 됩니다.';
-  render();
+  $('gps').textContent = e.code === 1 ? '위치 꺼짐 → 설정 › 개인정보 보호 › 위치 서비스 › Safari 「허용」. 버튼으로 진행해도 돼요.' : '위치를 잡는 중… (실내·지하는 느려요)';
 }
 if ('geolocation' in navigator) navigator.geolocation.watchPosition(onPos, onErr, {enableHighAccuracy:true, maximumAge:30000, timeout:30000});
-else gpsMsg = '이 브라우저는 위치를 지원하지 않음';
 render();
 </script>
 </body>
